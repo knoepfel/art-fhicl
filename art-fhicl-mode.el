@@ -49,7 +49,7 @@
 ;; The following must be added to your .emacs file:
 ;;
 ;;    (load "art-fhicl-mode.el" nil t t)
-;;    (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+;;    (add-to-list 'auto-mode-alist '("\\.fcl$" . art-fhicl-mode))
 
 ;;; Known Bugs:
 ;;
