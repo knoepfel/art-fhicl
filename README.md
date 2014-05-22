@@ -3,7 +3,7 @@ art-fhicl-mode
 ==============
 
 Commentary:
-===========
+-----------
 
  This is a major mode for editing files FHiCL files that are used
  with the art framework.  It has rudimentary commenting features and
@@ -23,7 +23,7 @@ Commentary:
  This mode was developed with help from Andrei Gaponenko (Fermilab).
 
 Installation:
-=============
+-------------
 
  The following must be added to your .emacs file:
 
@@ -31,16 +31,9 @@ Installation:
     (add-to-list 'auto-mode-alist '("\\.fcl$" . art-fhicl-mode))
 
 Known Bugs:
-===========
+-----------
 
- (1) This mode does not currently support syntax highlighting for
-     bracketed constructs like:
-
-        list[0]: a.v
-
-     which is supported by FHiCL.
-
- (2) The highlighting for "process_name", "source", "services",
+ (1) The highlighting for "process_name", "source", "services",
      "physics", and "outputs" is keyword-face ONLY if these identifiers
      occur at the start of a line.  If the indentation facility is
      enabled, this happens automatically.

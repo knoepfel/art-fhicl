@@ -6,7 +6,7 @@
 ;; Author: Kyle Knoepfel <knoepfel@fnal.gov>
 ;;
 ;; Keywords: art fhicl framework 
-;; Version: 0.1.0
+;; Version: 0.2.0
 
 ;; This file is not part of Emacs
 
@@ -53,14 +53,7 @@
 
 ;;; Known Bugs:
 ;;
-;; (1) This mode does not currently support syntax highlighting for
-;;     bracketed constructs like:
-;;
-;;        list[0]: a.v
-;;
-;;     which is supported by FHiCL.
-;;
-;; (2) The highlighting for "process_name", "source", "services",
+;; (1) The highlighting for "process_name", "source", "services",
 ;;     "physics", and "outputs" is keyword-face ONLY if these identifiers
 ;;     occur at the start of a line.  If the indentation facility is
 ;;     enabled, this happens automatically.
@@ -75,13 +68,10 @@
                            "false"
                            "infinity" ) )
 (setq art-fhicl-module-type '("module_type") )
-(setq art-fhicl-keywords-prolog '( "BEGIN_PROLOG" 
-                                   "END_PROLOG") )
 
 ;; create regex string for each class of keywords
 (setq art-fhicl-reserved-regexp (regexp-opt art-fhicl-reserved 'words))
 (setq art-fhicl-module-type-regexp (regexp-opt art-fhicl-module-type 'words))
-(setq art-fhicl-keywords-prolog-regexp (regexp-opt art-fhicl-keywords-prolog 'words))
 (setq art-fhicl-keyword-nil-regexp (regexp-quote "@nil"))
 (setq art-fhicl-keyword-local-regexp (regexp-quote "@local"))
 (setq art-fhicl-keyword-db-regexp (regexp-quote "@db"))
@@ -90,16 +80,16 @@
 (setq art-fhicl-font-lock-keywords
       `(
 	;; comment-face
-        ;; ;; uses: match . highlighter expression
-	(,"\\(?:^\\|\\s-*\\)\\(#[^include]\\|//\\).*$" . (0 font-lock-comment-face t ))
+        ;; ;; uses: match . highlighter(s) expression
+	(,"\\(?:^\\|\\s-*\\)\\(#\\|//\\).*$" . (0 font-lock-comment-face t ))
 	;; keyword-face
-	(,"^process_name[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"^source[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"^services[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"^physics[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"^outputs[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"trigger_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"end_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
+	(,"^\\(process_name[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
+	(,"^\\(source[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
+	(,"^\\(services[^\\._[:alnum:]]*\\):" .(1 font-lock-keyword-face))
+	(,"^\\(physics[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
+	(,"^\\(outputs[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
+	(,"[[:space:]]trigger_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
+	(,"[[:space:]]end_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
 	;; function-name-face
 	(,"[[:space:]]producers[^\\._[:alnum:]]" . font-lock-function-name-face)
 	(,"[[:space:]]analyzers[^\\._[:alnum:]]" . font-lock-function-name-face)
@@ -116,15 +106,16 @@
 	(,"[[:space:]]outputCommands[^\\._[:alnum:]]" . font-lock-type-face )
 	(,"[[:space:]]fileNames?[^\\._[:alnum:]]" . font-lock-type-face)
 	;; builtin-face
-        (,"^#include[[:space:]]" . font-lock-builtin-face )
-	(,art-fhicl-keywords-prolog-regexp . font-lock-builtin-face )
+        (,"^\\(^#include[[:space:]]\\)\\(\".*\"\\)" (1 font-lock-builtin-face t) (2 font-lock-string-face t) )
+        (,"^BEGIN_PROLOG[[:space:]]" . font-lock-builtin-face)
+        (,"^END_PROLOG[[:space:]]" . font-lock-builtin-face)
 	;; constant-face
 	(,art-fhicl-reserved-regexp   . font-lock-constant-face)
 	(,art-fhicl-keyword-nil-regexp . font-lock-constant-face )
 	(,art-fhicl-keyword-local-regexp . font-lock-constant-face )
 	(,art-fhicl-keyword-db-regexp . font-lock-constant-face )
 	;; variable-name-face
-	(,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\):" 
+	(,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\)\\(\\[[0-9]*\\]\\)*[[:space:]]*:"  
          (2 font-lock-variable-name-face ))))
 
 ;; syntax table
