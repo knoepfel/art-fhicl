@@ -75,6 +75,8 @@
 (setq art-fhicl-keyword-nil-regexp (regexp-quote "@nil"))
 (setq art-fhicl-keyword-local-regexp (regexp-quote "@local"))
 (setq art-fhicl-keyword-db-regexp (regexp-quote "@db"))
+(setq art-fhicl-keyword-table-regexp (regexp-quote "@table"))
+(setq art-fhicl-keyword-sequence-regexp (regexp-quote "@sequence"))
 
 ;; create the list for font-lock.
 (setq art-fhicl-font-lock-keywords
@@ -114,6 +116,8 @@
 	(,art-fhicl-keyword-nil-regexp . font-lock-constant-face )
 	(,art-fhicl-keyword-local-regexp . font-lock-constant-face )
 	(,art-fhicl-keyword-db-regexp . font-lock-constant-face )
+	(,art-fhicl-keyword-table-regexp . font-lock-constant-face )
+	(,art-fhicl-keyword-sequence-regexp . font-lock-constant-face )
 	;; variable-name-face
 	(,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\)\\(\\[[0-9]*\\]\\)*[[:space:]]*:"  
          (2 font-lock-variable-name-face ))))
