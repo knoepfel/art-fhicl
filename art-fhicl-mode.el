@@ -1,12 +1,12 @@
 ;;; art-fhicl-mode.el --- Major mode for editing FHiCL files used with
 ;;; the art framework
 
-;; Copyright (C) 2014 Fermilab
+;; Copyright (C) 2016 Fermilab
 
 ;; Author: Kyle Knoepfel <knoepfel@fnal.gov>
 ;;
-;; Keywords: art fhicl framework 
-;; Version: 0.2.0
+;; Keywords: art fhicl framework
+;; Version: 0.3.0
 
 ;; This file is not part of Emacs
 
@@ -67,87 +67,77 @@
                            "true"
                            "false"
                            "infinity" ) )
-(setq art-fhicl-module-type '("module_type") )
 
 ;; create regex string for each class of keywords
 (setq art-fhicl-reserved-regexp (regexp-opt art-fhicl-reserved 'words))
-(setq art-fhicl-module-type-regexp (regexp-opt art-fhicl-module-type 'words))
 (setq art-fhicl-keyword-nil-regexp (regexp-quote "@nil"))
 (setq art-fhicl-keyword-local-regexp (regexp-quote "@local"))
-(setq art-fhicl-keyword-db-regexp (regexp-quote "@db"))
 (setq art-fhicl-keyword-table-regexp (regexp-quote "@table"))
 (setq art-fhicl-keyword-sequence-regexp (regexp-quote "@sequence"))
+(setq art-fhicl-keyword-db-regexp (regexp-quote "@db"))
+(setq art-fhicl-keyword-id-regexp (regexp-quote "@id"))
+(setq art-fhicl-keyword-erase-regexp (regexp-quote "@erase"))
+(setq art-fhicl-keyword-protect-ignore-regexp (regexp-quote "@protect_ignore:"))
+(setq art-fhicl-keyword-protect-error-regexp (regexp-quote "@protect_error:"))
 
 ;; create the list for font-lock.
 (setq art-fhicl-font-lock-keywords
       `(
-	;; comment-face
+        ;; comment-face
         ;; ;; uses: match . highlighter(s) expression
-	(,"\\(?:^\\|\\s-*\\)\\(#\\|//\\).*$" . (0 font-lock-comment-face t ))
-	;; keyword-face
-	(,"^\\(process_name[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
-	(,"^\\(source[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
-	(,"^\\(services[^\\._[:alnum:]]*\\):" .(1 font-lock-keyword-face))
-	(,"^\\(physics[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
-	(,"^\\(outputs[^\\._[:alnum:]]*\\):" . (1 font-lock-keyword-face))
-	(,"[[:space:]]trigger_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
-	(,"[[:space:]]end_paths[^\\._[:alnum:]]" . font-lock-keyword-face)
-	;; function-name-face
-	(,"[[:space:]]producers[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]analyzers[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]filters[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]user[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]message[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]TFileService[^\\._[:alnum:]]" . font-lock-function-name-face)
-	(,"[[:space:]]RandomNumberGenerator[^\\._[:alnum:]]" . font-lock-function-name-face)
-	;; type-face
-	(,art-fhicl-module-type-regexp . font-lock-type-face )
-	(,"[[:space:]]maxEvents[^\\._[:alnum:]]" . font-lock-type-face )
-        (,"[[:space:]]skipEvents[^\\._[:alnum:]]" . font-lock-type-face )
-	(,"[[:space:]]SelectEvents[^\\._[:alnum:]]" . font-lock-type-face )
-	(,"[[:space:]]outputCommands[^\\._[:alnum:]]" . font-lock-type-face )
-	(,"[[:space:]]fileNames?[^\\._[:alnum:]]" . font-lock-type-face)
-	;; builtin-face
+        (,"\\(?:^\\|\\s-*\\)\\(#\\|//\\).*$" . (0 font-lock-comment-face t))
+        ;; keyword-face
+        (,"^\\(process_name\\|source\\|services\\|physics\\|outputs\\)[^\\._[:alnum:]]" . (1 font-lock-keyword-face))
+        (,"[[:space:]]\\(trigger_paths\\|end_paths\\|rpath\\)[^\\._[:alnum:]]" . (1 font-lock-keyword-face))
+        ;; function-name-face
+        (,"[[:space:]]\\(producers\\|filters\\|analyzers\\|results\\)[^\\._[:alnum:]]" . (1 font-lock-function-name-face))
+        ;; type-face
+        (,"[[:space:]]\\(module_type\\)[^\\._[:alnum:]]" . (1 font-lock-type-face))
+        ;; builtin-face
         (,"^\\(^#include[[:space:]]\\)\\(\".*\"\\)" (1 font-lock-builtin-face t) (2 font-lock-string-face t) )
-        (,"^BEGIN_PROLOG[[:space:]]" . font-lock-builtin-face)
-        (,"^END_PROLOG[[:space:]]" . font-lock-builtin-face)
-	;; constant-face
-	(,art-fhicl-reserved-regexp   . font-lock-constant-face)
-	(,art-fhicl-keyword-nil-regexp . font-lock-constant-face )
-	(,art-fhicl-keyword-local-regexp . font-lock-constant-face )
-	(,art-fhicl-keyword-db-regexp . font-lock-constant-face )
-	(,art-fhicl-keyword-table-regexp . font-lock-constant-face )
-	(,art-fhicl-keyword-sequence-regexp . font-lock-constant-face )
-	;; variable-name-face
-	(,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\)\\(\\[[0-9]*\\]\\)*[[:space:]]*:"  
+        (,"^\\(BEGIN\\|END\\)_PROLOG[[:space:]]" . font-lock-builtin-face)
+        ;; constant-face
+        (,art-fhicl-reserved-regexp   . font-lock-constant-face)
+        (,art-fhicl-keyword-nil-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-local-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-table-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-sequence-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-db-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-id-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-erase-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-protect-ignore-regexp . font-lock-constant-face)
+        (,art-fhicl-keyword-protect-error-regexp . font-lock-constant-face)
+        ;; variable-name-face
+        ;; ... allow for @protect_ignore/error bindings
+        (,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\)\\(\\[[0-9]*\\]\\)*[[:space:]]*\\(?:@.*\\)*:"
          (2 font-lock-variable-name-face ))))
 
 ;; syntax table
 (defvar art-fhicl-syntax-table nil "Syntax table for `art-fhicl-mode'.")
 (setq art-fhicl-syntax-table
       (let ((synTable (make-syntax-table)))
-	synTable))
+        synTable))
 
 ;; indentation
 (defvar art-fhicl-indent-offset 3
   "*Indentation offset for `art-fhicl-mode'.")
 
-(defun art-fhicl-indent-line() 
+(defun art-fhicl-indent-line()
   "Indent current line for `art-fhicl-mode'."
   (interactive)
   (let ((indent-col 0))
     (save-excursion
       (beginning-of-line)
       (condition-case nil
-	  (while t
-	    (backward-up-list 1)
-	    (when (looking-at "[[{]")
-	      (setq indent-col (+ indent-col art-fhicl-indent-offset))))
-	(error nil)))
+          (while t
+            (backward-up-list 1)
+            (when (looking-at "[[{]")
+              (setq indent-col (+ indent-col art-fhicl-indent-offset))))
+        (error nil)))
     (save-excursion
       (back-to-indentation)
       (when (and (looking-at "[]}]") (>= indent-col art-fhicl-indent-offset))
-	(setq indent-col (- indent-col art-fhicl-indent-offset))))
+        (setq indent-col (- indent-col art-fhicl-indent-offset))))
     (indent-line-to indent-col)))
 
 ;; define the major mode.
