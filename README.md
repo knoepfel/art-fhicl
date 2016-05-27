@@ -37,3 +37,5 @@ Known Bugs:
      "physics", and "outputs" is keyword-face ONLY if these identifiers
      occur at the start of a line.  If the indentation facility is
      enabled, this happens automatically.
+
+ (2) The character '#' or sequence of characters "//", when appearing in a string literal will be parsed as the beginning of a comment.
