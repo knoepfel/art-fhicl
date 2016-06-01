@@ -1,5 +1,5 @@
 ==============
-art-fhicl-mode
+art-fhicl-mode (0.3.1)
 ==============
 
 Commentary:
