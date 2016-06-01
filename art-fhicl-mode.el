@@ -131,7 +131,6 @@
     (indent-line-to indent-col)))
 
 ;; define the major mode.
-;;(define-derived-mode art-fhicl-mode fundamental-mode
 (define-derived-mode art-fhicl-mode fundamental-mode
   "art-fhicl-mode is a major mode for editing language art-fhicl."
   :syntax-table art-fhicl-syntax-table
