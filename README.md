@@ -36,11 +36,15 @@ Known Bugs:
 
  (1) Strings that start in a comment take precedence.  For example,
      the following line:
-    # here is comment with a "string
+ 
+    # here is a comment with a "string
+
      could cause a problem if not terminated in a subsequent comment
      line.
 
  (2) For lines using multiple assignments and the modified binding
      operators (e.g.):
+ 
     here @protect_error: are   two: assignments
+
      The "two" name will not be highlighted correctly.
