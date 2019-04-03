@@ -137,6 +137,8 @@
 
   (make-local-variable 'art-fhicl-indent-offset)
   (set (make-local-variable 'indent-line-function) 'art-fhicl-indent-line)
+  (setq comment-start "# ")
+  (setq comment-end "")
   (setq font-lock-defaults '(art-fhicl-font-lock-keywords))
   (setq major-mode 'art-fhicl-mode)
   (setq mode-name "art-fhicl")
