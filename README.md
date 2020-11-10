@@ -9,17 +9,12 @@ the art framework.  It has rudimentary commenting features and
 indentation support.  The syntax highlighting is done such that
 strings reserved to/used by FHiCL or art are placed in either:
 
-   constant-face,
-   keyword-face,
-   function-name-face, or
-   type-face
+- constant-face,
+- keyword-face,
+- function-name-face, or
+- type-face
 
-depending on the priority of the string (according to the author's
-understanding of FHiCL and art).  Very little attempt has been made to
-optimize the syntax below, due to the author's very limited knowledge
-of elisp.
-
-This mode was developed with help from Andrei Gaponenko (Fermilab).
+depending on the priority of the string.
 
 Installation:
 -------------
