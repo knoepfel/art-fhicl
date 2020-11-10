@@ -1,12 +1,12 @@
 ;;; art-fhicl-mode.el --- Major mode for editing FHiCL files used with
 ;;; the art framework
 
-;; Copyright (C) 2016 Fermilab
+;; Copyright (C) 2014 Fermilab
 
 ;; Author: Kyle Knoepfel <knoepfel@fnal.gov>
 ;;
 ;; Keywords: art fhicl framework
-;; Version: 0.3.1
+;; Version: 0.4.0
 
 ;; This file is not part of Emacs
 
@@ -48,59 +48,54 @@
 ;;
 ;; The following must be added to your .emacs file:
 ;;
-;;    (load "art-fhicl-mode.el" nil t t)
-;;    (add-to-list 'auto-mode-alist '("\\.fcl$" . art-fhicl-mode))
+;;    (load "art-fhicl-mode")
 
 ;;; Known Bugs:
 ;;
-;; (1) Strings that start in a comment take precedence.  For example,
-;;     the following line:
-;;        # here is comment with a "string
-;;     could cause a problem if not terminated in a subsequent comment
-;;     line.
-;;
-;; (2) For lines using multiple assignments and the modified binding
-;;     operators (e.g.):
-;;        here @protect_error: are   two: assignments
-;;     The "two" name will not be highlighted correctly.
+;; (1) The highlighting for "process_name", "source", "services",
+;;     "physics", and "outputs" is keyword-face ONLY if these identifiers
+;;     occur at the start of a line.  If the indentation facility is
+;;     enabled, this happens automatically.
 
 (defvar art-fhicl-mode-hook nil)
 
 ;; define several classes of keywords
-(setq art-fhicl-reserved '("RootInput"
-                           "RootOutput"
-                           "EmptyEvent"))
+(setq art-fhicl-reserved '("true"
+                           "false"
+                           "infinity"))
 
 ;; create regex string for each class of keywords
 (setq art-fhicl-reserved-regexp (regexp-opt art-fhicl-reserved 'words))
+(setq art-fhicl-keyword-nil-regexp (regexp-quote "@nil"))
+
 ;; create the list for font-lock.
 (setq art-fhicl-font-lock-keywords
       `(
-        ;; uses: match . highlighter(s) expression
         ;; comment-face
-        (,"\\(?:^\\|[[:space:]]*\\)\\(\\(#\\|//\\).*\\)$" . (1 font-lock-comment-face t))
-        (,"[^#]+:[[:space:]]*\\(\"[^\"]*?\"\\)" . (1 font-lock-string-face t))
+        (,"\\(?:^\\|\\s-*\\)\\(#\\|//\\).*$" . (0 font-lock-comment-face t ))
         ;; keyword-face
-        (,"^\\(process_name\\|source\\|services\\|physics\\|outputs\\)[[:space:]]*:" . (1 font-lock-keyword-face))
-        (,"[[:space:]]+\\(trigger_paths\\|end_paths\\|rpath\\)[[:space:]]*:" . (1 font-lock-keyword-face))
+        (,"^\\(process_name\\)[[:space:]]*):" . (1 font-lock-keyword-face))
+        (,"^\\(source\\)[[:space:]]*:" . (1 font-lock-keyword-face))
+        (,"^\\(services\\)[[:space:]]*:" .(1 font-lock-keyword-face))
+        (,"^\\(physics\\)[[:space:]]*:" . (1 font-lock-keyword-face))
+        (,"^\\(outputs\\)[[:space:]]*:" . (1 font-lock-keyword-face))
+        (,"^[[:space:]]+\\(trigger_paths\\)[[:space:]]*:*" . (1 font-lock-keyword-face))
+        (,"^[[:space:]]+\\(end_paths\\)[[:space:]]*:" . (1 font-lock-keyword-face))
         ;; function-name-face
-        (,"[[:space:]]+\\(producers\\|filters\\|analyzers\\|results\\)[[:space:]]*:" . (1 font-lock-function-name-face))
-        ;; type-face
-        (,"[[:space:]]+\\(module_type\\)[[:space:]]*:" . (1 font-lock-type-face))
+        (,"^[[:space:]]+\\(producers\\)[[:space:]]*:" . (1 font-lock-function-name-face))
+        (,"^[[:space:]]+\\(analyzers\\)[[:space:]]*:" . (1 font-lock-function-name-face))
+        (,"^[[:space:]]+\\(filters\\)[[:space:]]*:" . (1 font-lock-function-name-face))
         ;; builtin-face
-        (,"^\\(^#include\\) \\(\".*\"\\)" (1 font-lock-builtin-face t) (2 font-lock-string-face t) )
-        (,"^\\(BEGIN\\|END\\)_PROLOG[[:space:]]" . font-lock-builtin-face)
+        (,"^\\(^#include[[:space:]]\\)\\(\".*\"\\)" (1 font-lock-builtin-face t) (2 font-lock-string-face t) )
+        (,"^BEGIN_PROLOG[[:space:]]" . font-lock-builtin-face)
+        (,"^END_PROLOG[[:space:]]" . font-lock-builtin-face)
         ;; constant-face
-        ;; ... substitutions trailing with "::"
-        (,"\\(@local\\|@table\\|@sequence\\|@id\\|@db\\)::" . (1 font-lock-builtin-face))
-        ;; ... values that are on the right side of the standard binding operator (':')
-        (,":[[:space:]]*\\(@nil\\|@erase\\|true\\|false\\)" . (1 font-lock-builtin-face))
-        (,":[[:space:]]*[+-]?\\(infinity\\)" . (1 font-lock-builtin-face))
-        (,"[[:space:]]+\\(@protect_ignore\\|@protect_error\\):" (1 font-lock-constant-face))
+        (,"\\(@local\\|@sequence\\|@table\\|@id\\)::" . (1 font-lock-constant-face))
+        (,art-fhicl-reserved-regexp   . font-lock-constant-face)
+        (,art-fhicl-keyword-nil-regexp . font-lock-constant-face )
         ;; variable-name-face
-        ;; ... allow for @protect_ignore/error bindings
-        (,"\\(^\\|[[:space:]]+\\)\\([[:alnum:]\\._]+\\)[[:space:]]*\\(\\[[0-9]*\\]\\)*[[:space:]]*\\(?:@.*\\)*:"
-         (2 font-lock-variable-name-face))))
+        (,"\\(^\\|[[:space:]]\\)\\([[:alnum:]\\._]+[[:space:]]*\\)\\(\\[[0-9]*\\]\\)*[[:space:]]*:"
+         (2 font-lock-variable-name-face ))))
 
 ;; syntax table
 (defvar art-fhicl-syntax-table nil "Syntax table for `art-fhicl-mode'.")
@@ -109,7 +104,7 @@
         synTable))
 
 ;; indentation
-(defvar art-fhicl-indent-offset 3
+(defvar art-fhicl-indent-offset 2
   "*Indentation offset for `art-fhicl-mode'.")
 
 (defun art-fhicl-indent-line()
@@ -137,13 +132,12 @@
 
   (make-local-variable 'art-fhicl-indent-offset)
   (set (make-local-variable 'indent-line-function) 'art-fhicl-indent-line)
-  (setq comment-start "# ")
-  (setq comment-end "")
   (setq font-lock-defaults '(art-fhicl-font-lock-keywords))
   (setq major-mode 'art-fhicl-mode)
   (setq mode-name "art-fhicl")
   (run-hooks 'art-fhicl-mode-hook))
 
-(provide 'art-fhicl-mode)
+;; associate .fcl files with art-fhicl-mode
+(add-to-list 'auto-mode-alist '("\\.fcl$" . art-fhicl-mode))
 
-;; -- end of file
+(provide 'art-fhicl-mode)
