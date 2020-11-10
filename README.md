@@ -1,4 +1,4 @@
-# art-fhicl-mode (0.4)
+# art-fhicl-mode
 
 This is a major mode for editing files FHiCL files that are used with
 the art framework.  It has rudimentary commenting features and
@@ -17,7 +17,7 @@ depending on the priority of the string.
 Place the `art-fhicl-mode.el` file in a directory `<my_dir>`, and add
 the following commands to your `.emacs` file:
 
-```.elisp
+```.lisp
 (add-to-list 'load-path "<my_dir>")
 (load "art-fhicl-mode")
 ```
